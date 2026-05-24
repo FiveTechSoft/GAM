@@ -313,6 +313,26 @@ In practice, for the small $T$ used here (~24 tokens), the
 Transformer's quadratic term is negligible.  The advantage of GAM
 becomes decisive at long sequences ($T > 1024$).
 
+\begin{table}[h]
+\centering
+\begin{tabular}{lccccc}
+\toprule
+Model & $d_\text{model}$ & Layers & Transformer & GAM & $\Delta$ \\
+\midrule
+Ours (1L) & 64 & 1 & 54.0k & 53.9k & $-0.1\%$ \\
+Ours (3L) & 64 & 3 & 151.8k & 151.6k & $-0.1\%$ \\
+GPT-2 Small & 768 & 12 & 124M & 113M & $-9\%$ \\
+GPT-2 Medium & 1024 & 24 & 355M & 320M & $-10\%$ \\
+LLaMA 7B & 4096 & 32 & 6.7B & 6.1B & $-9\%$ \\
+\bottomrule
+\end{tabular}
+\caption{Estimated parameter count at different scales.  Embedding and
+output-head parameters are included assuming a vocabulary of 32k tokens.
+GAM saves $\sim$9--10\% for models where the embedding overhead is
+negligible.}
+\label{tab:scale}
+\end{table}
+
 % ══════════════════════════════════════════════════════════════════════
 \section{Related Work}
 \label{sec:related}
