@@ -1,32 +1,22 @@
-name: Compile LaTeX Paper
-
-# Trigger: manual dispatch only
-
-on:
-  workflow_dispatch:
-
+name: compile-paper
+on: workflow_dispatch
 jobs:
   compile:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-
       - name: Install TeX
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-bibtex-extra texlive-fonts-recommended
-
-      - name: Compile paper.tex (4 passes: pdflatex -> bibtex -> pdflatex -> pdflatex)
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-bibtex-extra texlive-fonts-recommended
+      - name: Compile
         run: |
           pdflatex -interaction=nonstopmode paper.tex
           bibtex paper || true
           pdflatex -interaction=nonstopmode paper.tex
           pdflatex -interaction=nonstopmode paper.tex
-
-      - name: Commit PDF to repo
+      - name: Commit PDF
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add paper.pdf
-          git commit -m "Add compiled paper.pdf [skip ci]" || echo "Nothing to commit"
+          git commit -m "Add compiled paper.pdf [skip ci]" || true
           git push
