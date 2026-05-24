@@ -1,5 +1,7 @@
 name: compile-paper
 on: workflow_dispatch
+permissions:
+  contents: write
 jobs:
   compile:
     runs-on: ubuntu-22.04
