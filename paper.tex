@@ -14,7 +14,6 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{enumitem}
-\usepackage{natbib}
 \usepackage{doi}
 
 \hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}
@@ -56,19 +55,19 @@ strategy, and comparative benchmarks on three synthetic tasks.
 \section{Introduction}
 \label{sec:intro}
 
-The Transformer \citep{vaswani2017attention} has become the dominant
+The Transformer \cite{vaswani2017attention} has become the dominant
 architecture for sequence modelling, powering large language models
-(LLMs)~\citep{brown2020language}, vision transformers~\citep{dosovitskiy2020image},
+(LLMs)~\cite{brown2020language}, vision transformers~\cite{dosovitskiy2020image},
 and multimodal systems.  Its core mechanism --- scaled dot-product
 attention --- computes pairwise interactions between all positions,
 yielding $\mathcal{O}(n^2)$ time and memory in sequence length~$n$.
 
 This quadratic cost is the primary bottleneck for long-context modelling.
 A large body of work has proposed alternatives: linearised attention
-\citep{katharopoulos2020transformers,katharopoulos2020linear},
-state-space models~\citep{gu2023mamba},
-recurrent neural networks~\citep{peng2023rwkv},
-and fast-weight memories~\citep{schlag2021linear}.
+\cite{katharopoulos2020transformers,katharopoulos2020linear},
+state-space models~\cite{gu2023mamba},
+recurrent neural networks~\cite{peng2023rwkv},
+and fast-weight memories~\cite{schlag2021linear}.
 
 We contribute a particularly simple member of this family:
 \textbf{Gated Associative Memory (GAM)}.  A GAM layer maintains a
@@ -149,7 +148,7 @@ Proper initialisation is crucial for stable training:
 \begin{itemize}[nosep]
   \item $W_q, W_k, W_v, W_g$: uniform $\pm 1/\sqrt{d}$.
   \item $b_g = -2$ (so the gate starts near $0.12$ --- nearly closed).
-  \item MLP weights: Xavier uniform~\citep{glorot2010understanding}.
+  \item MLP weights: Xavier uniform~\cite{glorot2010understanding}.
   \item Embedding and output projection: normal with std $0.02$.
 \end{itemize}
 The closed gate at initialisation prevents early chaotic updates to
@@ -179,7 +178,7 @@ $H$, letting the residual and MLP paths learn first.
 \section{Experiments}
 \label{sec:exp}
 
-We compare GAM against a single-head Transformer~\citep{vaswani2017attention}
+We compare GAM against a single-head Transformer~\cite{vaswani2017attention}
 with identical hyperparameters on three synthetic tasks.  Both models
 use sinusoidal positional encodings and the same residual-MLP block
 for fair comparison.
@@ -316,32 +315,32 @@ becomes decisive at long sequences ($T > 1024$).
 \label{sec:related}
 
 \textbf{Fast Weights.}
-Schmidhuber~\citep{schmidhuber1992learning} proposed updating a
+Schmidhuber~\cite{schmidhuber1992learning} proposed updating a
 separate weight matrix at each step via an outer product.
-Ba et al.~\citep{ba2016using} revived the idea for neural networks,
+Ba et al.~\cite{ba2016using} revived the idea for neural networks,
 using a scalar learning rate.  GAM differs by using a learned
 per-dimension gate and separate read ($q$) and write ($k$) projections.
 
 \textbf{DeltaNet.}
-Schlag et al.~\citep{schlag2021linear} introduced a linear transformer
+Schlag et al.~\cite{schlag2021linear} introduced a linear transformer
 with a delta-rule update and a per-layer learned scalar gate.  Our
 update rule is nearly identical, but we use a \emph{per-dimension
 vector gate} and add a full residual-MLP block as in the Transformer.
 
 \textbf{Linear Transformers.}
-Katharopoulos et al.~\citep{katharopoulos2020transformers} replace
+Katharopoulos et al.~\cite{katharopoulos2020transformers} replace
 softmax with a kernel $\phi(Q)\phi(K)^\top$, achieving linear time.
 GAM is conceptually simpler (no kernel trick, no attention matrix) but
 loses the ability to compare all pairs in parallel.
 
 \textbf{State-Space Models (SSMs).}
-Mamba~\citep{gu2023mamba} and S4~\citep{gu2021efficiently} use
+Mamba~\cite{gu2023mamba} and S4~\cite{gu2021efficiently} use
 structured linear ODEs with a selection mechanism.  GAM uses a
 discrete update rule (delta rule) rather than a continuous ODE,
 making it more similar to a gated RNN with a matrix hidden state.
 
 \textbf{RWKV.}
-Peng et al.~\citep{peng2023rwkv} reformulate attention as a linear
+Peng et al.~\cite{peng2023rwkv} reformulate attention as a linear
 RNN with learned decay channels.  GAM's update is simpler (single
 outer product with gating), but RWKV has been demonstrated at 7B+
 parameter scales.
@@ -366,10 +365,10 @@ parameter scales.
   \item \textbf{Multi-head GAM}: several independent $H$ matrices with
     different projections, mimicking multi-head attention.
   \item \textbf{Forget gate}: add an explicit decay mechanism to
-    $H$, as in LSTM~\citep{hochreiter1997long}.
+    $H$, as in LSTM~\cite{hochreiter1997long}.
   \item \textbf{Causal kernel form}: derive a parallel formulation
     that avoids materialising $H$ at training time (like Mamba-2
-    \citep{dao2024transformers}).
+    \cite{dao2024transformers}).
   \item \textbf{Scaling study}: train GAM on standard language
     modelling benchmarks (Wikitext-103, The Pile) at 100M--1B
     parameter scales.
@@ -388,7 +387,7 @@ and extend.  We release all code and experiments at
 \url{https://github.com/FiveTechSoft/GAM}.
 
 % ══════════════════════════════════════════════════════════════════════
-\bibliographystyle{plainnat}
+\bibliographystyle{plain}
 \begin{thebibliography}{99}
 
 \bibitem{ba2016using}
