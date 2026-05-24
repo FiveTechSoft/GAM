@@ -1,5 +1,7 @@
 name: Compile LaTeX Paper
 
+# Trigger: manual dispatch only
+
 on:
   workflow_dispatch:
 
