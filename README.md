@@ -259,6 +259,25 @@ easily analysable module.
 
 ---
 
+## Citation
+
+If you use GAM in your research, please cite it as:
+
+```bibtex
+@software{gam2025,
+  title        = {GAM: Gated Associative Memory — A Linear-Time Alternative to Transformer Attention},
+  author       = {{FiveTechSoft} and {CCHarbour}},
+  year         = {2025},
+  month        = {may},
+  url          = {https://github.com/FiveTechSoft/GAM},
+  version      = {1.0.0},
+  note         = {Architecture description and benchmarks available in the repository paper.},
+  doi          = {10.5281/zenodo.XXXXXXX}
+}
+```
+
+---
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
