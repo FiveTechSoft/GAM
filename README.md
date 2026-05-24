@@ -1,6 +1,7 @@
 # GAM — Gated Associative Memory
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/FiveTechSoft/GAM/blob/master/gam_demo.ipynb)
+[![Paper](https://img.shields.io/badge/paper-PDF-b31b1b.svg)](paper.pdf)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c?logo=pytorch&logoColor=white)](https://pytorch.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Code size](https://img.shields.io/github/languages/code-size/fivetechsoft/GAM)](https://github.com/FiveTechSoft/GAM)
