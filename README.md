@@ -1,5 +1,10 @@
 # GAM — Gated Associative Memory
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/FiveTechSoft/GAM/blob/master/gam_demo.ipynb)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c?logo=pytorch&logoColor=white)](https://pytorch.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Code size](https://img.shields.io/github/languages/code-size/fivetechsoft/GAM)](https://github.com/FiveTechSoft/GAM)
+
 A neural sequence architecture that replaces the Transformer's multi-head
 attention with a **learned associative memory** updated via a **gated delta
 rule**.  GAM runs in **O(n)** time (vs O(n²) for attention) while matching
