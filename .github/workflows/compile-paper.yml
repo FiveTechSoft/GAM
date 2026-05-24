@@ -10,13 +10,11 @@ jobs:
       - name: Compile
         run: |
           pdflatex -interaction=nonstopmode paper.tex
-          bibtex paper || true
-          pdflatex -interaction=nonstopmode paper.tex
           pdflatex -interaction=nonstopmode paper.tex
       - name: Commit PDF
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add paper.pdf
+          git add -f paper.pdf
           git commit -m "Add compiled paper.pdf [skip ci]" || true
           git push
