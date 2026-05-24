@@ -64,7 +64,7 @@ yielding $\mathcal{O}(n^2)$ time and memory in sequence length~$n$.
 
 This quadratic cost is the primary bottleneck for long-context modelling.
 A large body of work has proposed alternatives: linearised attention
-\cite{katharopoulos2020transformers,katharopoulos2020linear},
+\cite{katharopoulos2020transformers},
 state-space models~\cite{gu2023mamba},
 recurrent neural networks~\cite{peng2023rwkv},
 and fast-weight memories~\cite{schlag2021linear}.
@@ -74,9 +74,11 @@ We contribute a particularly simple member of this family:
 $d\times d$ matrix~$H$ that is read and written at each step via a
 gated delta rule.  The resulting module has:
 \begin{itemize}[nosep]
-  \item $\mathcal{O}(n)$ time and $\mathcal{O}(d^2)$ space per layer.
+  \item $\mathcal{O}(n)$ time per layer; $\mathcal{O}(d^2)$ memory at
+        inference, $\mathcal{O}(T \cdot d^2)$ at training (due to the
+        unrolled recurrence).
   \item ~4 projected matrices, one matrix recurrence, and a familiar
-        residual-MLP block --- no softmax, no positional encoding.
+        residual-MLP block --- no softmax.
   \item ~12$d^2$ parameters per layer, slightly fewer than a
         corresponding single-head Transformer.
 \end{itemize}
@@ -180,8 +182,9 @@ $H$, letting the residual and MLP paths learn first.
 
 We compare GAM against a single-head Transformer~\cite{vaswani2017attention}
 with identical hyperparameters on three synthetic tasks.  Both models
-use sinusoidal positional encodings and the same residual-MLP block
-for fair comparison.
+use sinusoidal positional encodings (for the Transformer this is
+required; for GAM it is optional but was added for a fair comparison
+on identical inputs).
 
 \subsection{Setup}
 \label{sec:setup}
