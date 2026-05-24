@@ -5,29 +5,24 @@ on:
 
 jobs:
   compile:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
 
-      - name: Compile paper.tex
-        uses: xu-cheng/latex-action@v3
-        with:
-          root_file: paper.tex
-          latexmk_use_xelatex: false
-
-      - name: Upload PDF artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: paper
-          path: paper.pdf
-
-      - name: Download and commit PDF
+      - name: Install TeX
         run: |
-          gh run download "${{ github.run_id }}" -n paper -R ${{ github.repository }}
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq texlive-latex-base texlive-latex-recommended texlive-bibtex-extra texlive-fonts-recommended
+
+      - name: Compile paper.tex (2 passes)
+        run: |
+          pdflatex -interaction=nonstopmode paper.tex
+          pdflatex -interaction=nonstopmode paper.tex
+
+      - name: Commit PDF to repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add paper.pdf
-          git commit -m "Add compiled paper.pdf [skip ci]" || true
+          git commit -m "Add compiled paper.pdf [skip ci]" || echo "Nothing to commit"
           git push
-        env:
-          GH_TOKEN: ${{ github.token }}
