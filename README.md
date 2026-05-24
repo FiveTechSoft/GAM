@@ -42,7 +42,7 @@ GAM strips the Transformer down to:
 |---|---|
 | Multi-head self-attention (QKV + softmax + O) | Associative memory (one matrix H) |
 | Positional encoding (learned / sinusoidal) | Implicit ordering via recurrence |
-| O(n²) time, O(n) memory per layer | O(n) time, O(1) memory per layer (~d²) |
+| O(n²) time, O(n) memory per layer | O(n) time, O(d²) memory per layer (constant in T) |
 
 ---
 
@@ -51,21 +51,21 @@ GAM strips the Transformer down to:
 ### Forward pass (one layer, one time step)
 
 ```
-x = X[t]                          # (d,)           current embedding
+x = X[t]                                   # (d,)  current embedding
 
-q = W_q · x                       # query for reading
-k = W_k · x                       # key   for writing
-v = W_v · x                       # value for writing
-g = sigmoid(W_g · x + b_g)        # write gate, 0..1
+q = W_q · x                                # query for reading
+k = W_k · x                                # key   for writing
+v = W_v · x                                # value for writing
+g = sigmoid(W_g · x + b_g)                 # per-dim write gate, 0..1
 
-read = H_{t-1} · q                # associative recall
-error = v - H_{t-1} · k           # delta-rule residual
-ΔH = g ⊗ error ⊗ kᵀ               # outer product (write)
+read   = H_{t-1} · q                       # associative recall
+error  = v - H_{t-1} · k                   # delta-rule residual
+ΔH[i,j] = g[i] * error[i] * k[j]           # gated outer product
 H_t = H_{t-1} + ΔH
 
-mem_out = LayerNorm(read + x)     # residual + norm
+mem_out = LayerNorm(read + x)              # residual + norm
 z = GeLU(W₁ · mem_out)
-out = mem_out + W₂ · z            # MLP + residual
+out = mem_out + W₂ · z                     # MLP + residual
 ```
 
 ### Multi-layer stacking
@@ -167,14 +167,14 @@ class GAMLM(nn.Module):
 ### Run benchmarks
 
 ```bash
-# Single-layer copy task
-python benchmark_copy.py
+# Single-layer copy task (3 seeds by default)
+python benchmark_copy.py --seeds 42 43 44
 
 # Three tasks (gap-copy, running-sum, reverse) — single layer
-python benchmark_3tasks.py
+python benchmark_3tasks.py --seeds 42 43 44
 
 # Same three tasks — 3 layers
-python benchmark_3layers.py
+python benchmark_3layers.py --seeds 42 43 44
 ```
 
 ---
@@ -192,36 +192,33 @@ python benchmark_3layers.py
 | Training sequences | 1 500 |
 | Test sequences | 300 |
 
-### Results: 1 layer (54k params)
+> **Note (v1.1):** the previous single-seed numbers below the v1.0
+> tag should be re-generated. The delta-rule outer-product had its
+> `error`/`k` indices swapped (the implementation worked but did not
+> match the description in this README); see `CHANGELOG.md`.
+> Re-run the benchmarks with `--seeds 42 43 44` and report mean ± std
+> before drawing conclusions.
 
-| Task | GAM | Transformer | Delta |
-|---|---|---|---|
-| Gap Copy | **57.6%** | 57.0% | **+0.7%** |
-| Running Sum | 22.7% | **28.4%** | –5.7% |
-| Reverse | 28.7% | **39.1%** | –10.3% |
+### Reproducing the benchmarks
 
-### Results: 3 layers (~152k params)
+```bash
+python benchmark_3tasks.py  --seeds 42 43 44   # 1 layer
+python benchmark_3layers.py --seeds 42 43 44   # 3 layers
+```
 
-| Task | GAM 3L | Transformer 3L | Delta |
-|---|---|---|---|
-| Gap Copy | **57.6%** | 57.6% | +0.0% |
-| Running Sum | 26.7% | **29.3%** | –2.6% |
-| Reverse | **45.6%** | 23.7% | **+21.9%** |
+Output reports `mean ± std` over the supplied seeds for both GAM and a
+parameter-matched single-head Transformer baseline.
 
-### Key observations
+### Expected qualitative findings (to be re-confirmed)
 
-- **Gap Copy**: both models saturate at ~57–58 %.  Memory through gaps is
-  equally easy for recurrence and attention.
-- **Running Sum**: Transformer retains a small lead, but GAM's gap
-  shrinks from –5.7 to –2.6 when depth increases from 1 to 3 layers.
-- **Reverse**: GAM **improves 17 points** when stacked to 3 layers,
-  while Transformer **drops 15 points**.  The recurrent memory stack
-  can reorder tokens progressively; causal self-attention fragments
-  and loses information with depth for this task.
-
-**Bottom line:** GAM matches or beats a same-sized Transformer on 2 of 3
-tasks at 3 layers, using **O(n)** instead of **O(n²)** and with simpler
-code.
+- **Gap Copy**: GAM and Transformer should perform comparably; memory
+  through padding gaps is equally easy for recurrence and attention.
+- **Running Sum**: Transformer tends to lead slightly; GAM's gap is
+  expected to narrow with more layers.
+- **Reverse**: stacking GAM layers should help long-range reordering
+  noticeably more than stacking causal Transformer layers, since the
+  recurrent memory can re-emit tokens progressively while causal
+  attention fragments the reversed segment.
 
 ---
 
@@ -264,15 +261,13 @@ easily analysable module.
 If you use GAM in your research, please cite it as:
 
 ```bibtex
-@software{gam2025,
-  title        = {GAM: Gated Associative Memory — A Linear-Time Alternative to Transformer Attention},
-  author       = {{FiveTechSoft} and {CCHarbour}},
-  year         = {2025},
-  month        = {may},
-  url          = {https://github.com/FiveTechSoft/GAM},
-  version      = {1.0.0},
-  note         = {Architecture description and benchmarks available in the repository paper.},
-  doi          = {10.5281/zenodo.XXXXXXX}
+@software{gam2026,
+  title   = {GAM: Gated Associative Memory — A Linear-Time Alternative to Transformer Attention},
+  author  = {{FiveTechSoft} and {CCHarbour}},
+  year    = {2026},
+  url     = {https://github.com/FiveTechSoft/GAM},
+  version = {1.1.0},
+  note    = {Architecture description and benchmarks available in the repository paper.}
 }
 ```
 

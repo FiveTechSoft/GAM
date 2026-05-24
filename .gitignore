@@ -34,3 +34,14 @@ venv/
 .venv/
 env/
 .env
+
+# Pytest
+.pytest_cache/
+
+# Training artifacts
+*.pt
+*.ckpt
+runs/
+wandb/
+checkpoints/
+*.png.original
